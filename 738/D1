@@ -1,0 +1,131 @@
+#include "bits/stdc++.h"
+using namespace std;
+
+#define eps 1e-8
+#define F first
+#define S second
+#define vec vector
+#define ll long long
+#define ld long double
+#define nl cout << '\n';
+#define chk(x) cout << (#x) << " is " << (x) << endl;
+#define chk2(x, y) cout << (x) << " " << (y) << endl;
+#define chk3(x, y, z) cout << (x) << " " << (y) << " " << (z) << endl;
+#define chkp(x) chk2(x.first, x.second);
+
+void makeSet(int v, vector<int> &parent, vector<int> &rank) {
+    parent[v] = v;
+    rank[v] = 0;
+}
+
+int find_set(int v, vector<int> &parent) {
+    if (v == parent[v])
+        return v;
+
+    return parent[v] = find_set(parent[v], parent);
+}
+
+void union_sets(int v1, int v2, vector<int> &parent, vector<int> &rank) {
+    v1 = find_set(v1, parent);
+    v2 = find_set(v2, parent);
+
+    if (v1 != v2) {
+        if (rank[v1] < rank[v2])
+            swap(v1, v2);
+
+        parent[v2] = v1;
+
+        if (rank[v1] == rank[v2])
+            ++rank[v1];
+    }
+}
+
+void dfs(int id, vec<vec<int>> &adj, int v, vec<int> &k1) {
+    k1[v] = id;
+
+    for (auto u : adj[v])
+        if (k1[u] == -1)
+            dfs(id, adj, u, k1);
+}
+
+void solve() {
+    int n, m1, m2, i, j, u, v, id1, id2;
+    cin >> n >> m1 >> m2;
+    vec<int> k1(n + 1, -1), k2(n + 1, -1), parent1(n + 1, -1), rank1(n + 1, -1), parent2(n + 1, -1), rank2(n + 1, -1);
+    vec<vec<int>> adj1(n + 1), adj2(n + 1);
+
+    for (i = 0; i < m1; ++i) {
+        cin >> u >> v;
+        adj1[u].push_back(v);
+        adj1[v].push_back(u);
+    }
+
+    for (i = 0; i < m2; ++i) {
+        cin >> u >> v;
+        adj2[u].push_back(v);
+        adj2[v].push_back(u);
+    }
+
+    for (i = 1, id1 = -1; i <= n; ++i) {
+        if (k1[i] == -1)
+            dfs(++id1, adj1, i, k1);
+    }
+
+    for (i = 1, id2 = -1; i <= n; ++i) {
+        if (k2[i] == -1)
+            dfs(++id2, adj2, i, k2);
+    }
+
+    vec<vec<int>> st1(id1 + 1);
+    vec<vec<int>> st2(id2 + 1);
+
+    for (i = 1; i <= n; ++i) {
+        makeSet(i, parent1, rank1);
+        makeSet(i, parent2, rank2);
+        st1[k1[i]].push_back(i);
+        st2[k2[i]].push_back(i);
+    }
+
+    for (auto v : st1) {
+        for (i = 0; i < v.size() - 1; ++i)
+            union_sets(v[i], v[i + 1], parent1, rank1);
+    }
+
+    for (auto v : st2) {
+        for (i = 0; i < v.size() - 1; ++i)
+            union_sets(v[i], v[i + 1], parent2, rank2);
+    }
+
+    vec<pair<int, int>> ans;
+
+    for (i = 1; i <= n; ++i) {
+        for (j = i + 1; j <= n; ++j) {
+            if (find_set(i, parent1) != find_set(j, parent1) && find_set(i, parent2) != find_set(j, parent2)) {
+                union_sets(i, j, parent1, rank1);
+                union_sets(i, j, parent2, rank2);
+                ans.push_back({i, j});
+            }
+        }
+    }
+
+    cout << ans.size() << endl;
+
+    for (auto k : ans)
+        cout << k.F << " " << k.S << endl;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
+    int t = 1, i;
+    // cin >> t;
+
+    for (i = 1; i <= t; ++i)
+        solve();
+
+    return 0;
+}

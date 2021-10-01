@@ -1,0 +1,69 @@
+#include "bits/stdc++.h"
+using namespace std;
+
+#define eps 1e-8
+#define F first
+#define S second
+#define vec vector
+#define ll long long
+#define ld long double
+#define nl cout << '\n';
+#define chk(x) cout << (#x) << " is " << (x) << endl;
+#define chk2(x, y) cout << (x) << " " << (y) << endl;
+#define chk3(x, y, z) cout << (x) << " " << (y) << " " << (z) << endl;
+#define chkp(x) chk2(x.first, x.second);
+
+void solve() {
+    int n, i, j;
+    string s;
+    cin >> n >> s;
+
+    for (i = 0; i < n && s[i] == '?'; ++i);
+
+    j = i;
+
+    if (j == n) {
+        --j;
+        s[j] = 'R';
+    }
+
+    for (i = j - 1; i >= 0; --i) {
+        if (s[i] != '?')
+            continue;
+
+        if (s[i + 1] == 'R')
+            s[i] = 'B';
+
+        if (s[i + 1] == 'B')
+            s[i] = 'R';
+    }
+
+    for (i = j + 1; i < n; ++i) {
+        if (s[i] != '?')
+            continue;
+
+        if (s[i - 1] == 'R')
+            s[i] = 'B';
+
+        if (s[i - 1] == 'B')
+            s[i] = 'R';
+    }
+
+    cout << s << endl;
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
+    int t = 1, i;
+    cin >> t;
+
+    for (i = 1; i <= t; ++i)
+        solve();
+
+    return 0;
+}
